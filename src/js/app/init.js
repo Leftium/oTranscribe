@@ -17,6 +17,8 @@ import { exportSetup } from './export';
 import importSetup from './import';
 import viewController from './view-controller';
 
+import {setEditorContents} from './texteditor';
+
 export default function init(){
     initBackup();
     watchFormatting();
@@ -82,19 +84,21 @@ export default function init(){
 
 }
 
+function create (file) {
+    const driver = isVideoFormat(file) ? playerDrivers.HTML5_VIDEO : playerDrivers.HTML5_AUDIO;
+    createPlayer({
+        driver: driver,
+        source: window.URL.createObjectURL(file),
+        name: file.name
+    }).then(() => {
+        bindPlayerToUI(file.name);
+    });
+}
+
 // note: this function may run multiple times
 function onLocalized() {
-    const resetInput = inputSetup({
-        create: file => {
-            const driver = isVideoFormat(file) ? playerDrivers.HTML5_VIDEO : playerDrivers.HTML5_AUDIO;
-		    createPlayer({
-		        driver: driver,
-		        source: window.URL.createObjectURL(file),
-                name: file.name
-		    }).then(() => {
-                bindPlayerToUI(file.name);
-		    });
-        },
+    let resetInput = inputSetup({
+        create: create,
         createFromURL: url => {
 		    createPlayer({
 		        driver: playerDrivers.YOUTUBE,
@@ -135,5 +139,57 @@ $(window).resize(function() {
         document.getElementById('media').style.width = oT.media.videoWidth();
     }
 });
+
+function handleDragover (e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+}
+
+function handleDrop (e) {
+    e.preventDefault();
+    let dt = e.dataTransfer;
+    let files = dt.files;
+
+    let videoFile = null;
+    let textFile = null;
+
+    [...files].forEach(function(file) {
+        console.log(file.type);
+        if(file.type.match(/^video/)) {
+            videoFile = file
+        } else {
+            textFile = file
+        }
+    });
+
+
+    if(videoFile) {
+        const player = getPlayer();
+        if (player) {
+            player.destroy();
+        }
+        create(videoFile);
+
+        $('.topbar').removeClass('inputting');
+        $('.input').removeClass('active');
+        $('.sbutton.time').addClass('active');
+        $('.text-panel').addClass('editing');
+        $('.ext-input-field').hide();
+        $('.file-input-outer').removeClass('ext-input-active');
+    }
+
+    if(textFile) {
+        let reader = new FileReader();
+        reader.onload = function(event) {
+            const file = JSON.parse(event.target.result);
+            setEditorContents(file.text);
+        };
+        reader.readAsText(textFile);
+    }
+}
+
+document.body.addEventListener('dragover', handleDragover);
+document.body.addEventListener('drop', handleDrop);
+
 
 
