@@ -1,6 +1,6 @@
 const $ = require('jquery');
 const Mustache = require('mustache');
-const toMarkdown = require('to-markdown');
+const TurndownService = require('turndown').default;
 const template = require('raw-loader!../../html/export-panel.ms');
 import googleDriveSetup from './export-formats/google-drive';
 import { getPlayer } from './player/player';
@@ -20,6 +20,9 @@ let exportFormats = {
     send: []
 };
 
+
+
+let turndownService = new TurndownService()
 exportFormats.download.push({
     name: 'Markdown',
     extension: 'md',
@@ -27,8 +30,8 @@ exportFormats.download.push({
         const fullyClean = sanitizeHtml(txt, {
             allowedTags: [ 'p', 'em', 'strong', 'i', 'b', 'br' ]
         });
-        const md = toMarkdown( fullyClean );
-        return md.replace(/\t/gm,"");           
+        const md = turndownService.turndown( fullyClean );
+        return md.replace(/\t/gm,"");
     }
 });
 
@@ -39,7 +42,7 @@ exportFormats.download.push({
         const fullyClean = sanitizeHtml(txt, {
             allowedTags: [ 'p' ]
         });
-        const md = toMarkdown( fullyClean );
+        const md = turndownService.turndown( fullyClean );
         return md.replace(/\t/gm,"");           
     }
 });
