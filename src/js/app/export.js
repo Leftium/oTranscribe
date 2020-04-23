@@ -20,6 +20,52 @@ let exportFormats = {
     send: []
 };
 
+let html2Markdown = function(html) {
+  var i, len, line, lines, markdown, options, results, turndownService;
+  turndownService = new TurndownService();
+  turndownService.escape = function(text) {
+    return text;
+  };
+  turndownService.addRule('p', options = {
+    filter: 'p',
+    replacement: function(content, node, options) {
+      // Replace non-breaking spaces with space
+      content = content.replace(/\u00a0/g, ' ');
+      return `\n${content}`;
+    }
+  });
+  turndownService.addRule('timestamp', options = {
+    filter: 'span',
+    replacement: function(content, node, options) {
+      var ms, timestamp;
+      if (node.className === 'timestamp') {
+        timestamp = node.dataset.timestamp;
+        ms = timestamp.split('.').pop();
+        return `<t ms=${ms}>${content}</t>`;
+      } else {
+        return content;
+      }
+    }
+  });
+  markdown = turndownService.turndown(html);
+  lines = markdown.split('\n');
+  results = [];
+// We want blank lines between notes and timestamps, but
+// keep consecutive timestamps to be tightly packed.
+  for (i = 0, len = lines.length; i < len; i++) {
+    line = lines[i];
+    if (line.match(/^<t ms=/)) {
+      line = `\n${line}<br>`;
+    } else {
+      line = line.replace(/\u00a0/g, ' ');
+    }
+    results.push(line);
+  }
+  markdown = results.join('\n');
+  // Remove extra newlines between consecutive timestamps.
+  return markdown = markdown.replace(/<br>\n\n/g, '<br>\n');
+};
+
 
 
 let turndownService = new TurndownService()
@@ -27,10 +73,7 @@ exportFormats.download.push({
     name: 'Markdown',
     extension: 'md',
     fn: (txt) => {
-        const fullyClean = sanitizeHtml(txt, {
-            allowedTags: [ 'p', 'em', 'strong', 'i', 'b', 'br' ]
-        });
-        const md = turndownService.turndown( fullyClean );
+        const md = html2Markdown(txt);
         return md.replace(/\t/gm,"");
     }
 });
@@ -43,7 +86,7 @@ exportFormats.download.push({
             allowedTags: [ 'p' ]
         });
         const md = turndownService.turndown( fullyClean );
-        return md.replace(/\t/gm,"");           
+        return md.replace(/\t/gm,"");
     }
 });
 
