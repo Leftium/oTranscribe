@@ -140,6 +140,36 @@ $(window).resize(function() {
     }
 });
 
+
+var markdown2Html, mdtsRE;
+
+mdtsRE = /<t ms=(?<ms>\d+)>(?<m>\d\d):(?<s>\d\d)<\/t>/;
+
+markdown2Html = function(markdown) {
+  var groups, html, i, len, line, lines, m, matches, ms, results, s, seconds;
+  lines = markdown.split('\n');
+  results = [];
+  for (i = 0, len = lines.length; i < len; i++) {
+    line = lines[i];
+    if (matches = line.match(mdtsRE)) {
+      groups = matches.groups;
+      // Convert timestamp to seconds
+      m = parseInt(groups.m, 10);
+      s = parseInt(groups.s, 10);
+      ms = parseInt(groups.ms, 10);
+      seconds = m * 60 + s + ms / 1000;
+      line = line.replace(mdtsRE, `<span class="timestamp" data-timestamp="${seconds}">${groups.m}:${groups.s}</span>`);
+    } else {
+      // Ensure spacing preserved with non-breaking spaces.
+      line = line.replace(/[ ]/g, '\u00a0');
+      line = `${line}<br/>`;
+    }
+    results.push(line);
+  }
+  return html = results.join('\n');
+};
+
+
 function handleDragover (e) {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
@@ -181,8 +211,16 @@ function handleDrop (e) {
     if(textFile) {
         let reader = new FileReader();
         reader.onload = function(event) {
-            const file = JSON.parse(event.target.result);
-            setEditorContents(file.text);
+            let text = event.target.result
+            // Convert from md if required
+            if(textFile.name.split('.').pop() === 'md') {
+                text = markdown2Html(text);
+            } else {
+                const otr = JSON.parse(text);
+                text = otr.text;
+            }
+
+            setEditorContents(text);
         };
         reader.readAsText(textFile);
     }
