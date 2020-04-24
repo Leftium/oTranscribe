@@ -114,16 +114,6 @@ exportFormats.download.push({
     }
 });
 
-exportFormats.send.push({
-    name: 'Google Drive',
-    setup: function(cb) {
-        this.checkGoogleAuth = googleDriveSetup(cb);
-    },
-    fn: function(opts) {
-        this.checkGoogleAuth(opts);
-    }
-})
-
 function generateButtons(filename) {
     
     const downloadData = exportFormats.download.map(format => {
