@@ -274,5 +274,6 @@ textbox.addEventListener('keydown', function (e) {
     }
 });
 
-
-
+$(function() {
+    viewController.set('editor');
+});

@@ -1,7 +1,7 @@
 import {showSettings} from './settings/settings.jsx';
 const $ = (sel) => document.querySelector(sel);
 
-let currentView = 'about';
+let currentView = 'editor';
 
 const views = {
     about: () => {
