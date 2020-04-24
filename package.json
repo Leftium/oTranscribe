@@ -49,8 +49,5 @@
     "sanitize-html": "^1.13.0",
     "turndown": "^6.0.0",
     "webl10n": "^1.0.0"
-  },
-  "engines": {
-    "node": ">=v9"
   }
 }
