@@ -213,7 +213,9 @@ function handleDrop (e) {
         reader.onload = function(event) {
             let text = event.target.result
             // Convert from md if required
-            if(textFile.name.split('.').pop() === 'md') {
+            let matches = textFile.name.match(/(.+?)(\.[^.]*$|$)/);
+            if (matches[2] === '.md') {
+                localStorage.setItem('basename', matches[1]);
                 text = markdown2Html(text);
             } else {
                 const otr = JSON.parse(text);

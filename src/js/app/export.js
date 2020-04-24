@@ -12,6 +12,9 @@ function getTexteditorContents() {
 }
 
 function getFilename() {
+    if (localStorage.getItem('basename')) {
+        return localStorage.getItem('basename');
+    }
     return document.webL10n.get('file-name') + " " + (new Date()).toUTCString();
 }
 
