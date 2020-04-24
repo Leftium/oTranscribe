@@ -233,20 +233,44 @@ let textbox = document.getElementById("textbox");
 textbox.addEventListener('keydown', function (e) {
     if (e.keyCode === 9) { // tab key
         e.preventDefault();  // this will prevent us from tabbing out of the editor
+        let isShift = !!e.shiftKey;
+        if (!isShift) {
+            // now insert four non-breaking spaces for the tab key
+            var editor = textbox
+            var doc = editor.ownerDocument.defaultView;
+            var sel = doc.getSelection();
+            var range = sel.getRangeAt(0);
 
-        // now insert four non-breaking spaces for the tab key
-        var editor = textbox
-        var doc = editor.ownerDocument.defaultView;
-        var sel = doc.getSelection();
-        var range = sel.getRangeAt(0);
+            var tabNode = document.createTextNode("\u00a0\u00a0\u00a0\u00a0");
 
-        var tabNode = document.createTextNode("\u00a0\u00a0\u00a0\u00a0");
-        range.insertNode(tabNode);
+            range.insertNode(tabNode);
 
-        range.setStartAfter(tabNode);
-        range.setEndAfter(tabNode); 
-        sel.removeAllRanges();
-        sel.addRange(range);
+            range.setStartAfter(tabNode);
+            range.setEndAfter(tabNode); 
+            sel.removeAllRanges();
+            sel.addRange(range);
+        } else {
+            document.execCommand('delete', false, null);
+            document.execCommand('delete', false, null);
+            document.execCommand('delete', false, null);
+            document.execCommand('delete', false, null);
+        }
+
+    }
+    if (e.keyCode === 13) {
+        e.preventDefault();
+
+        let sel = document.getSelection()
+        let node = sel.anchorNode
+        let text = node.nodeValue
+        let parent = node.parentNode
+
+        if (parent != textbox) {
+            text = parent.textContent
+        }
+        let indent = text.match(/^\s*/g)[0]
+
+        document.execCommand('insertText', false, '\n' + indent);
     }
 });
 
