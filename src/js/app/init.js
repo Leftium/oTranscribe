@@ -184,7 +184,6 @@ function handleDrop (e) {
     let textFile = null;
 
     [...files].forEach(function(file) {
-        console.log(file.type);
         if(file.type.match(/^video/)) {
             videoFile = file
         } else {
