@@ -17,9 +17,9 @@ import { exportSetup } from './export';
 import importSetup from './import';
 import viewController from './view-controller';
 
-import {setEditorContents} from './texteditor';
+import { setEditorContents } from './texteditor';
 
-export default function init(){
+export default function init() {
     initBackup();
     watchFormatting();
     languageSetup();
@@ -31,16 +31,15 @@ export default function init(){
     // this is necessary due to execCommand restrictions
     // see: http://stackoverflow.com/a/33321235
     window.insertTimestamp = insertTimestamp;
-    
+
     keyboardShortcutSetup();
 
     viewController.set('about');
 
     // Gather query parameters into an object
     otrQueryParams = getQueryParams();
-
     // If the ?v=<VIDEO_ID> parameter is found in the URL, auto load YouTube video
-    if ( otrQueryParams['v'] ){
+    if (otrQueryParams['v']) {
         $('.start').removeClass('ready');
         createPlayer({
             driver: playerDrivers.YOUTUBE,
@@ -49,22 +48,36 @@ export default function init(){
             inputHide();
             viewController.set('editor');
             bindPlayerToUI();
-            let timestamp = otrQueryParams['t']; 
-            if ( timestamp ){
+            let timestamp = otrQueryParams['t'];
+            if (timestamp) {
                 // Is the timestamp in HH:MM::SS format?
-                if ( ~timestamp.indexOf(":") ){
+                if (~timestamp.indexOf(":")) {
                     timestamp = convertTimestampToSeconds(timestamp);
-                } 
+                }
                 player.driver._ytEl.seekTo(timestamp);
             }
         });
 
+    } else if (otrQueryParams['vsl']) {
+        $('.start').removeClass('ready');
+        createPlayer({
+            driver: playerDrivers.YOUTUBE,
+            source: "https://www.youtube.com/watch?v=Qs4bLhXU7Cg"
+        }).then((player) => {
+            inputHide();
+            $.get('/txt/thebiorhythm.md', {}, function (content) {
+                let html = markdown2Html(content);
+                setEditorContents(html);
+            });
+            viewController.set('editor');
+            bindPlayerToUI();
+        });
     } else {
 
-        if ( localStorageManager.getItem("oT-lastfile") ) {
+        if (localStorageManager.getItem("oT-lastfile")) {
             viewController.set('editor');
         }
-        
+
     }
 
     $('.title').mousedown(() => {
@@ -84,7 +97,7 @@ export default function init(){
 
 }
 
-function create (file) {
+function create(file) {
     const driver = isVideoFormat(file) ? playerDrivers.HTML5_VIDEO : playerDrivers.HTML5_AUDIO;
     createPlayer({
         driver: driver,
@@ -100,15 +113,15 @@ function onLocalized() {
     let resetInput = inputSetup({
         create: create,
         createFromURL: url => {
-		    createPlayer({
-		        driver: playerDrivers.YOUTUBE,
-		        source: url
-		    }).then(() => {
+            createPlayer({
+                driver: playerDrivers.YOUTUBE,
+                source: url
+            }).then(() => {
                 bindPlayerToUI();
-		    });
+            });
         }
     });
-    
+
     watchWordCount();
 
     var startText = document.webL10n.get('start-ready');
@@ -119,7 +132,7 @@ function onLocalized() {
         .click(() => {
             viewController.set('editor');
         });
-    
+
     $('.reset').off().on('click', () => {
         const player = getPlayer();
         resetInput();
@@ -127,15 +140,15 @@ function onLocalized() {
             player.destroy();
         }
     });
-    
+
     oldBrowserCheck();
     // oT.input.loadPreviousFileDetails();
 }
 
 window.addEventListener('localized', onLocalized, false);
 
-$(window).resize(function() {
-    if (document.getElementById('media') ) {
+$(window).resize(function () {
+    if (document.getElementById('media')) {
         document.getElementById('media').style.width = oT.media.videoWidth();
     }
 });
@@ -145,37 +158,37 @@ var markdown2Html, mdtsRE;
 
 mdtsRE = /<t ms=(?<ms>\d+)>(?<m>\d\d):(?<s>\d\d)<\/t>/;
 
-markdown2Html = function(markdown) {
-  var groups, html, i, len, line, lines, m, matches, ms, results, s, seconds;
-  lines = markdown.split('\n');
-  results = [];
-  for (i = 0, len = lines.length; i < len; i++) {
-    line = lines[i];
-    if (matches = line.match(mdtsRE)) {
-      groups = matches.groups;
-      // Convert timestamp to seconds
-      m = parseInt(groups.m, 10);
-      s = parseInt(groups.s, 10);
-      ms = parseInt(groups.ms, 10);
-      seconds = m * 60 + s + ms / 1000;
-      line = line.replace(mdtsRE, `<span class="timestamp" data-timestamp="${seconds}">${groups.m}:${groups.s}</span>`);
-    } else {
-      // Ensure spacing preserved with non-breaking spaces.
-      line = line.replace(/[ ]/g, '\u00a0');
-      line = `${line}<br/>`;
+markdown2Html = function (markdown) {
+    var groups, html, i, len, line, lines, m, matches, ms, results, s, seconds;
+    lines = markdown.split('\n');
+    results = [];
+    for (i = 0, len = lines.length; i < len; i++) {
+        line = lines[i];
+        if (matches = line.match(mdtsRE)) {
+            groups = matches.groups;
+            // Convert timestamp to seconds
+            m = parseInt(groups.m, 10);
+            s = parseInt(groups.s, 10);
+            ms = parseInt(groups.ms, 10);
+            seconds = m * 60 + s + ms / 1000;
+            line = line.replace(mdtsRE, `<span class="timestamp" data-timestamp="${seconds}">${groups.m}:${groups.s}</span>`);
+        } else {
+            // Ensure spacing preserved with non-breaking spaces.
+            line = line.replace(/[ ]/g, '\u00a0');
+            line = `${line}<br/>`;
+        }
+        results.push(line);
     }
-    results.push(line);
-  }
-  return html = results.join('\n');
+    return html = results.join('\n');
 };
 
 
-function handleDragover (e) {
+function handleDragover(e) {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
 }
 
-function handleDrop (e) {
+function handleDrop(e) {
     e.preventDefault();
     let dt = e.dataTransfer;
     let files = dt.files;
@@ -183,8 +196,8 @@ function handleDrop (e) {
     let videoFile = null;
     let textFile = null;
 
-    [...files].forEach(function(file) {
-        if(file.type.match(/^video/)) {
+    [...files].forEach(function (file) {
+        if (file.type.match(/^video/)) {
             videoFile = file
         } else {
             textFile = file
@@ -192,7 +205,7 @@ function handleDrop (e) {
     });
 
 
-    if(videoFile) {
+    if (videoFile) {
         const player = getPlayer();
         if (player) {
             player.destroy();
@@ -207,9 +220,9 @@ function handleDrop (e) {
         $('.file-input-outer').removeClass('ext-input-active');
     }
 
-    if(textFile) {
+    if (textFile) {
         let reader = new FileReader();
-        reader.onload = function(event) {
+        reader.onload = function (event) {
             let text = event.target.result
             // Convert from md if required
             let matches = textFile.name.match(/(.+?)(\.[^.]*$|$)/);
@@ -247,7 +260,7 @@ textbox.addEventListener('keydown', function (e) {
             range.insertNode(tabNode);
 
             range.setStartAfter(tabNode);
-            range.setEndAfter(tabNode); 
+            range.setEndAfter(tabNode);
             sel.removeAllRanges();
             sel.addRange(range);
         } else {
@@ -275,6 +288,6 @@ textbox.addEventListener('keydown', function (e) {
     }
 });
 
-$(function() {
+$(function () {
     viewController.set('editor');
 });

@@ -21,6 +21,7 @@
     "extract-text-webpack-plugin": "^2.0.0-beta.4",
     "html-loader": "^0.4.3",
     "html-webpack-plugin": "^2.22.0",
+    "http-server": "^0.12.1",
     "json-loader": "^0.5.3",
     "karma": "^0.13.22",
     "karma-chrome-launcher": "^0.2.2",
@@ -36,7 +37,6 @@
     "webpack-dev-server": "^2.0.0-beta"
   },
   "dependencies": {
-    "http-server": "^0.12.1",
     "jakecache": "git+https://github.com/kenchris/jakecache.git",
     "jquery": "^3.1.0",
     "keycode": "^2.1.8",
