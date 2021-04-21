@@ -70,6 +70,14 @@ export default function init() {
                 source = "https://youtu.be/EdGeGlCMiGE";
                 mdFile = '/txt/leanbelly.md';
                 break;
+            case 'okinawa-mobile':
+                source = "https://youtu.be/78gQNv-ptHQ";
+                mdFile = '/txt/okinawa-mobile.md';
+                break;
+            case 'okinawa-desktop':
+                source = "https://youtu.be/W0BcC0NMJV0";
+                mdFile = '/txt/okinawa-desktop.md';
+                break;
             default:
                 console.log('Unknown vsl: ' + otrQueryParams.vsl);
                 break;
