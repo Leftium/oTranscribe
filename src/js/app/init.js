@@ -38,6 +38,8 @@ export default function init() {
 
     // Gather query parameters into an object
     otrQueryParams = getQueryParams();
+    let source = null;
+    let mdFile = null;
     // If the ?v=<VIDEO_ID> parameter is found in the URL, auto load YouTube video
     if (otrQueryParams['v']) {
         $('.start').removeClass('ready');
@@ -58,20 +60,35 @@ export default function init() {
             }
         });
 
-    } else if (otrQueryParams['vsl']) {
-        $('.start').removeClass('ready');
-        createPlayer({
-            driver: playerDrivers.YOUTUBE,
-            source: "https://www.youtube.com/watch?v=Qs4bLhXU7Cg"
-        }).then((player) => {
-            inputHide();
-            $.get('/txt/thebiorhythm.md', {}, function (content) {
-                let html = markdown2Html(content);
-                setEditorContents(html);
+    } else if (otrQueryParams.vsl) {
+        switch(otrQueryParams.vsl) {
+            case 'thebiorhythm':
+                source = "https://www.youtube.com/watch?v=Qs4bLhXU7Cg";
+                mdFile = '/txt/thebiorhythm.md';
+                break;
+            case 'leanbelly':
+                source = "https://youtu.be/EdGeGlCMiGE";
+                mdFile = '/txt/leanbelly.md';
+                break;
+            default:
+                console.log('Unknown vsl: ' + otrQueryParams.vsl);
+                break;
+        }
+        if (mdFile) {
+            $('.start').removeClass('ready');
+            createPlayer({
+                driver: playerDrivers.YOUTUBE,
+                source: source
+            }).then((player) => {
+                inputHide();
+                $.get(mdFile, {}, function (content) {
+                    let html = markdown2Html(content);
+                    setEditorContents(html);
+                });
+                viewController.set('editor');
+                bindPlayerToUI();
             });
-            viewController.set('editor');
-            bindPlayerToUI();
-        });
+        }
     } else {
 
         if (localStorageManager.getItem("oT-lastfile")) {
