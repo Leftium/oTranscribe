@@ -1,31 +1,36 @@
 <!DOCTYPE html>
 <html manifest="manifest.appcache">
-<head>
-    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
     <title>oTranscribe</title>
 
-    ${require('!raw-loader!./html/meta-tags.htm')}
+    <%= require('html-loader!./html/meta-tags.htm').default %>
 
-	<link rel="stylesheet" href="style.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="style.css" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"
+    />
     <link rel="prefetch" type="application/l10n" href="data.ini" />
-</head>
+  </head>
 
-<body>
-    
+  <body>
     <script type="text/javascript" src="l10n.js"></script>
-    <script src="./jakecache.js" type="text/javascript" charset="utf-8"></script>
+    <script
+      src="./jakecache.js"
+      type="text/javascript"
+      charset="utf-8"
+    ></script>
 
-    ${require('!raw-loader!./html/topbar.htm')}
+    <%= require('html-loader!./html/topbar.htm').default %> <%=
+    require('html-loader!./html/textbox.htm').default %> <%=
+    require('html-loader!./html/settings.htm').default %>
 
-    ${require('!raw-loader!./html/textbox.htm')}
+    <link
+      href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.1.0/css/font-awesome.css"
+      rel="stylesheet"
+    />
 
-    ${require('!raw-loader!./html/settings.htm')}
-
-    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.1.0/css/font-awesome.css" rel="stylesheet">
-    
-    ${require('!raw-loader!./html/google-analytics.htm')}
-
-</body>
-
+    <%= require('html-loader!./html/google-analytics.htm').default %>
+  </body>
 </html>
